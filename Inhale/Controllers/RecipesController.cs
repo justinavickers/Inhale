@@ -106,6 +106,8 @@ namespace Inhale.Controllers
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            EditRecipeViewModel viewModel = new EditRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
+
             if (id == null)
             {
                 return NotFound();
@@ -116,9 +118,12 @@ namespace Inhale.Controllers
             {
                 return NotFound();
             }
+
+            viewModel.Recipe = recipe;
+
             ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "RecipeTypeId", recipe.RecipeTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", recipe.UserId);
-            return View(recipe);
+            return View(viewModel);
         }
 
         // POST: Recipes/Edit/5

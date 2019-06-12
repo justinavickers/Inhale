@@ -1,10 +1,10 @@
-﻿@model Inhale.Models.Recipe
+﻿@model Inhale.Models.ViewModels.EditRecipeViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit Recipe</h1>
 
 <h4>Recipe</h4>
 <hr />
@@ -12,31 +12,30 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="RecipeId" />
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="Recipe.Name" class="control-label">Name</label>
+                <input asp-for="Recipe.Name" class="form-control" />
+                <span asp-validation-for="Recipe.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RecipeNotes" class="control-label"></label>
-                <input asp-for="RecipeNotes" class="form-control" />
-                <span asp-validation-for="RecipeNotes" class="text-danger"></span>
+                <label asp-for="Recipe.RecipeNotes" class="control-label">Recipe Notes</label>
+                <input asp-for="Recipe.RecipeNotes" class="form-control" />
+                <span asp-validation-for="Recipe.RecipeNotes" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="RecipeTypeId" class="control-label"></label>
-                <select asp-for="RecipeTypeId" class="form-control" asp-items="ViewBag.RecipeTypeId"></select>
-                <span asp-validation-for="RecipeTypeId" class="text-danger"></span>
+                <label asp-for="SelectedRecipeType" class="control-label">Category</label>
+                <select asp-for="SelectedRecipeType" class="form-control" asp-items="@Model.RecipeTypes"></select>
             </div>
             <div class="form-group">
-                <label asp-for="RecipeIngredients" class="control-label">Ingredients</label>
-                <select asp-for="RecipeIngredients" class="form-control" asp-items="ViewBag.IngredientId"></select>
+                <label asp-for="SelectedIngredients" class="control-label">Ingredients</label>
+                <select asp-for="SelectedIngredients" class="form-control" asp-items="@Model.Ingredients"></select>
             </div>
             <div class="form-group" hidden>
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <label asp-for="Recipe.UserId" type="hidden" class="control-label"></label>
+                <select asp-for="Recipe.UserId" type="hidden" class="form-control" asp-items="ViewBag.UserId"></select>
             </div>
+
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
