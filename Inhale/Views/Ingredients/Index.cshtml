@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Inhale.Models.Ingredient>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<table class="table">
+   
+    <tbody>
+@foreach (var item in Model)
+{
+    @if (item.IsOil)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            
+           
+        </tr>
+        }
+    }
+    </tbody>
+</table>
