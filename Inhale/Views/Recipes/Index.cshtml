@@ -13,19 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Recipe Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RecipeNotes)
+                Category
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RecipeType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                Ingredients
+                Created By
             </th>
             <th>
                 Favorite
@@ -45,21 +39,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RecipeNotes)
-            </td>
+          
             <td>
                 @Html.DisplayFor(modelItem => item.RecipeType.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.User.FirstName)
             </td>
-            @foreach (var r in item.RecipeIngredients)
-            {
-                <td>
-                    @Html.DisplayFor(modelItem => r.Ingredient.Name)
-                </td>
-            }
+       
           
 
             <td>

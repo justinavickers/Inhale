@@ -31,8 +31,28 @@ namespace Inhale.Controllers
         // GET: FavoriteRecipes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.FavoriteRecipes.Include(f => f.Recipe).Include(f => f.User);
-            return View(await applicationDbContext.ToListAsync());
+
+            var favoriteRecipes = await _context.FavoriteRecipes
+              .Include(f => f.Recipe).ToListAsync();
+
+
+
+            favoriteRecipes.ForEach(f => {
+                f.Recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
+                .Where(ing => ing.RecipeId == f.Recipe.RecipeId).ToList();
+                f.Recipe.RecipeType = _context.RecipeType.Where(rT => f.Recipe.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
+                f.Recipe.User = _context.ApplicationUsers.Where(u => f.Recipe.UserId == u.Id).FirstOrDefault();
+
+            });
+                
+                
+
+            
+              //.FirstOrDefaultAsync(m => m.FavoriteRecipesId == id);
+           // var applicationDbContext = _context.FavoriteRecipes.Include(f => f.Recipe).Include(f => f.User);
+
+            return View(favoriteRecipes);
+
         }
 
         // GET: FavoriteRecipes/Details/5
@@ -45,6 +65,7 @@ namespace Inhale.Controllers
 
             var favoriteRecipes = await _context.FavoriteRecipes
                 .Include(f => f.Recipe)
+                .ThenInclude(f => f.RecipeIngredients)
                 .Include(f => f.User)
                 .FirstOrDefaultAsync(m => m.FavoriteRecipesId == id);
             if (favoriteRecipes == null)
@@ -66,12 +87,9 @@ namespace Inhale.Controllers
     
         {
             var user = await GetCurrentUserAsync();
-           // HttpContext.Session.SetString("Message", "");
-
 
             if (_context.FavoriteRecipes.FirstOrDefault(fr => fr.RecipeId == id && fr.UserId == user.Id) !=null)
             {
-               // HttpContext.Session.SetString("Message", "You have already favorited this recipe.");
                 return RedirectToAction("Index", "Recipes");
 
             }
@@ -91,8 +109,6 @@ namespace Inhale.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index", "Recipes");
             }
-            //ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId", favoriteRecipes.RecipeId);
-            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", favoriteRecipes.UserId);
             return View(favoriteRecipes);
         }
 

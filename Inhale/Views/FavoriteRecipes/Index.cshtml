@@ -4,36 +4,51 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.Recipe)
             </th>
-            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Recipe.RecipeNotes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Recipe.RecipeType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Recipe.RecipeIngredients)
+            </th>
+            
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
+
             <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
+                @Html.DisplayFor(modelItem => item.Recipe.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Recipe.RecipeId)
+                @Html.DisplayFor(modelItem => item.Recipe.RecipeNotes)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.FavoriteRecipesId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.FavoriteRecipesId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId">Delete</a>
+                @Html.DisplayFor(modelItem => item.Recipe.RecipeType.Name)
+            </td>
+            @foreach (var r in item.Recipe.RecipeIngredients)
+        {
+             <td>
+                @Html.DisplayFor(modelItem => r.Ingredient.Name)
+            </td>
+        }
+          
+            <td>
+
+                <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId">Remove</a>
             </td>
         </tr>
 }
