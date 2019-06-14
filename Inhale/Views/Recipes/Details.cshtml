@@ -41,7 +41,13 @@
             @Html.DisplayNameFor(model => model.RecipeIngredients)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.RecipeIngredients)
+            @*@Html.DisplayFor(model => model.RecipeIngredients)*@
+            @foreach (var r in Model.RecipeIngredients)
+            {
+                <dt>
+                    @Html.DisplayFor(modelItem => r.Ingredient.Name)
+                </dt>
+            }
         </dd>
         <dt class="col-sm-2" hidden>
             @Html.DisplayNameFor(model => model.User)

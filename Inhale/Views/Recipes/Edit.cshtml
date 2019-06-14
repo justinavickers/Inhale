@@ -12,6 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Recipe.RecipeId"/>
             <div class="form-group">
                 <label asp-for="Recipe.Name" class="control-label">Name</label>
                 <input asp-for="Recipe.Name" class="form-control" />
