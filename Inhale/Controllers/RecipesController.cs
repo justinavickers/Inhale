@@ -27,10 +27,36 @@ namespace Inhale.Controllers
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         [Authorize]
         // GET: Recipes
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var applicationDbContext = _context.Recipes.Include(r => r.RecipeType).Include(r => r.User);
-            return View(await applicationDbContext.ToListAsync());
+
+            List<Recipe> recipes = _context.Recipes.ToList();
+
+
+            recipes.ForEach(
+                r => {
+                    r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
+                    .Where(ing => ing.RecipeId == r.RecipeId).ToList();
+                    r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
+                    r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
+
+            }); 
+            //_context.RecipeIngredients.Where(ri => ri.RecipeId == r.RecipeId).ToList());
+
+            // List<List<IGrouping<int, RecipeIngredients>>> recipeIngredientsList = new List<List<IGrouping<int, RecipeIngredients>>>();
+            // var recipeIngredients = _context.RecipeIngredients
+            //    .Include(ri => ri.Ingredient)
+            //    .Include(ri => ri.Recipe)
+            //    .ThenInclude(r => r.RecipeType)
+            //    .Include(ri => ri.Recipe)
+            //    .ThenInclude(r => r.User)
+            //    .GroupBy(ri => ri.RecipeId).ToList();
+
+            //recipeIngredientsList.Add(recipeIngredients);
+
+            //return View(recipeIngredientsList.AsEnumerable());
+            return View(recipes);
+
         }
 
         // GET: Recipes/Details/5
@@ -49,6 +75,7 @@ namespace Inhale.Controllers
             {
                 return NotFound();
             }
+            recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
 
             return View(recipe);
         }
@@ -106,6 +133,8 @@ namespace Inhale.Controllers
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            EditRecipeViewModel viewModel = new EditRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
+
             if (id == null)
             {
                 return NotFound();
@@ -116,9 +145,12 @@ namespace Inhale.Controllers
             {
                 return NotFound();
             }
+
+            viewModel.Recipe = recipe;
+
             ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "RecipeTypeId", recipe.RecipeTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", recipe.UserId);
-            return View(recipe);
+            return View(viewModel);
         }
 
         // POST: Recipes/Edit/5
@@ -126,23 +158,26 @@ namespace Inhale.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RecipeId,Name,RecipeNotes,RecipeTypeId,UserId")] Recipe recipe)
+        public async Task<IActionResult> Edit(int id, EditRecipeViewModel viewModel)
         {
-            if (id != recipe.RecipeId)
+
+            if (id != viewModel.Recipe.RecipeId)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+                viewModel.Recipe.RecipeTypeId = viewModel.SelectedRecipeType;
+
                 try
                 {
-                    _context.Update(recipe);
+                    _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RecipeExists(recipe.RecipeId))
+                    if (!RecipeExists(viewModel.Recipe.RecipeId))
                     {
                         return NotFound();
                     }
@@ -153,9 +188,9 @@ namespace Inhale.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "RecipeTypeId", recipe.RecipeTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", recipe.UserId);
-            return View(recipe);
+            ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "RecipeTypeId", viewModel.Recipe.RecipeTypeId);
+            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", viewModel.Recipe.User.Id);
+            return View(viewModel);
         }
 
         // GET: Recipes/Delete/5
