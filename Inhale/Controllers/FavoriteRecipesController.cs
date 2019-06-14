@@ -54,31 +54,31 @@ namespace Inhale.Controllers
             return View(favoriteRecipes);
         }
 
-        // GET: FavoriteRecipes/Create
-        public IActionResult Create()
-        {
-            //ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId");
-            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
-        }
+        
 
         // POST: FavoriteRecipes/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int RecipeId, FavoriteRecipes favoriteRecipes)
+        public async Task<IActionResult> Create(int id )
     
         {
             var user = await GetCurrentUserAsync();
-            favoriteRecipes.UserId = user.Id;
-            favoriteRecipes.RecipeId = RecipeId;
+            FavoriteRecipes favoriteRecipes = new FavoriteRecipes
+            {
+                RecipeId = id,
+                Recipe = _context.Recipes.FirstOrDefault( r => r.RecipeId == id),
+                UserId = user.Id,
+                User = user
+            };
+         
 
             if (ModelState.IsValid)
             {
                 _context.Add(favoriteRecipes);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _context.SaveChanges();
+                return RedirectToAction("Index", "Recipes");
             }
             //ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId", favoriteRecipes.RecipeId);
             //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", favoriteRecipes.UserId);

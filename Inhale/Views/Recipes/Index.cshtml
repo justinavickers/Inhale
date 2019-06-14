@@ -63,7 +63,7 @@
           
 
             <td>
-            <button formaction="FavoriteRecipes/Create?RecipeId=@item.RecipeId">Favorite</button>
+            <form asp-action="Create" asp-controller="FavoriteRecipes" asp-route-id="@item.RecipeId"><input type="Submit" value="Favorite" class="btn btn-primary"/></form>
             <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
             <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
             <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
