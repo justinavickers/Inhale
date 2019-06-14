@@ -9,6 +9,7 @@ using Inhale.Data;
 using Inhale.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 
 namespace Inhale.Controllers
 {
@@ -65,6 +66,16 @@ namespace Inhale.Controllers
     
         {
             var user = await GetCurrentUserAsync();
+           // HttpContext.Session.SetString("Message", "");
+
+
+            if (_context.FavoriteRecipes.FirstOrDefault(fr => fr.RecipeId == id && fr.UserId == user.Id) !=null)
+            {
+               // HttpContext.Session.SetString("Message", "You have already favorited this recipe.");
+                return RedirectToAction("Index", "Recipes");
+
+            }
+
             FavoriteRecipes favoriteRecipes = new FavoriteRecipes
             {
                 RecipeId = id,
