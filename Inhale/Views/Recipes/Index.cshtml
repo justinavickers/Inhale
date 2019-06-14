@@ -5,7 +5,6 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -25,7 +24,13 @@
             <th>
                 @Html.DisplayNameFor(model => model.User)
             </th>
-          
+            <th>
+                Ingredients
+            </th>
+            <th>
+                Favorite
+            </th>
+
 
 
 
@@ -49,16 +54,19 @@
             <td>
                 @Html.DisplayFor(modelItem => item.User.FirstName)
             </td>
-               @foreach (var r in item.RecipeIngredients)
-               {
+            @foreach (var r in item.RecipeIngredients)
+            {
                 <td>
                     @Html.DisplayFor(modelItem => r.Ingredient.Name)
                 </td>
-               }
+            }
+          
+
             <td>
-                <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
+            <button formaction="FavoriteRecipes/Create?RecipeId=@item.RecipeId">Favorite</button>
+            <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
             </td>
         </tr>
         }

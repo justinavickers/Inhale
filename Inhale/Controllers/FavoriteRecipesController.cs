@@ -8,17 +8,22 @@ using Microsoft.EntityFrameworkCore;
 using Inhale.Data;
 using Inhale.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Inhale.Controllers
 {
     public class FavoriteRecipesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public FavoriteRecipesController(ApplicationDbContext context)
+        public FavoriteRecipesController(ApplicationDbContext ctx,
+                          UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _userManager = userManager;
+            _context = ctx;
         }
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
 
         [Authorize]
@@ -52,8 +57,8 @@ namespace Inhale.Controllers
         // GET: FavoriteRecipes/Create
         public IActionResult Create()
         {
-            ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId");
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
+            //ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId");
+            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }
 
@@ -62,16 +67,21 @@ namespace Inhale.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FavoriteRecipesId,UserId,RecipeId")] FavoriteRecipes favoriteRecipes)
+        public async Task<IActionResult> Create(int RecipeId, FavoriteRecipes favoriteRecipes)
+    
         {
+            var user = await GetCurrentUserAsync();
+            favoriteRecipes.UserId = user.Id;
+            favoriteRecipes.RecipeId = RecipeId;
+
             if (ModelState.IsValid)
             {
                 _context.Add(favoriteRecipes);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId", favoriteRecipes.RecipeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", favoriteRecipes.UserId);
+            //ViewData["RecipeId"] = new SelectList(_context.Recipes, "RecipeId", "RecipeId", favoriteRecipes.RecipeId);
+            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", favoriteRecipes.UserId);
             return View(favoriteRecipes);
         }
 
