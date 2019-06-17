@@ -34,27 +34,15 @@ namespace Inhale.Controllers
 
 
             recipes.ForEach(
-                r => {
+                r =>
+                {
                     r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
                     .Where(ing => ing.RecipeId == r.RecipeId).ToList();
                     r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
                     r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
 
-            }); 
-            //_context.RecipeIngredients.Where(ri => ri.RecipeId == r.RecipeId).ToList());
+                });
 
-            // List<List<IGrouping<int, RecipeIngredients>>> recipeIngredientsList = new List<List<IGrouping<int, RecipeIngredients>>>();
-            // var recipeIngredients = _context.RecipeIngredients
-            //    .Include(ri => ri.Ingredient)
-            //    .Include(ri => ri.Recipe)
-            //    .ThenInclude(r => r.RecipeType)
-            //    .Include(ri => ri.Recipe)
-            //    .ThenInclude(r => r.User)
-            //    .GroupBy(ri => ri.RecipeId).ToList();
-
-            //recipeIngredientsList.Add(recipeIngredients);
-
-            //return View(recipeIngredientsList.AsEnumerable());
             return View(recipes);
 
         }
@@ -85,8 +73,6 @@ namespace Inhale.Controllers
         {
             NewRecipeViewModel viewModel = new NewRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
 
-            //ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "Name");
-            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View(viewModel);
         }
 
@@ -227,6 +213,47 @@ namespace Inhale.Controllers
         private bool RecipeExists(int id)
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
+        }
+
+        // GET: Products/MyRecipes
+        public async Task<IActionResult> MyRecipes()
+        {
+            var user = await GetCurrentUserAsync();
+            //get only the user's (who is logged in) products 
+            List<Recipe> recipes = _context.Recipes.ToList();
+
+
+            recipes.ForEach(
+                r =>
+                {
+                    r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
+                    .Where(ing => ing.RecipeId == r.RecipeId).ToList();
+                    r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
+                    r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
+
+                });
+
+            return View(recipes);
+            //var applicationDbContext1 = _context.Recipes.Include(r => r.RecipeType)
+            //       .Include(r => r.User)
+            //       .Include(r => r.RecipeId)
+            //       .ThenInclude(op => op.Order)
+            //       .Where(p => p.UserId == user.Id)
+            //       .Select(p => new Product
+            //       {
+            //           ProductId = p.ProductId,
+            //           DateCreated = p.DateCreated,
+            //           Description = p.Description,
+            //           Title = p.Title,
+            //           Price = p.Price,
+            //           Quantity = p.Quantity,
+            //           UserId = p.UserId,
+            //           City = p.City,
+            //           ImagePath = p.ImagePath,
+            //           ProductTypeId = p.ProductTypeId,
+            //           OrderProducts = p.OrderProducts.Where(op => op.Order.DateCompleted != null).ToList()
+            //       });
+
         }
     }
 }
