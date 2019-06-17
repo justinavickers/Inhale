@@ -155,9 +155,39 @@ namespace Inhale.Controllers
             if (ModelState.IsValid)
             {
                 viewModel.Recipe.RecipeTypeId = viewModel.SelectedRecipeType;
+                var ingredientsInRecipe =  _context.RecipeIngredients.Where(ri => ri.RecipeId == id).ToList();
 
                 try
                 {
+                    viewModel.SelectedIngredients.ForEach(i =>
+                    {
+                        var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == i);
+                        if(foundRecipe == null)
+                        {
+
+                        var ri = new RecipeIngredients
+                        {
+                            IngredientId = i,
+                            Recipe = viewModel.Recipe,
+                            Amount = "0"
+                        };
+                        _context.Update(ri);
+                        _context.SaveChanges();
+                        }
+                    });
+
+
+                    //ingredientsInRecipe.ForEach(I =>
+                    //{
+                    //    var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
+                    //    if(foundIngredient == 0)
+                    //    {
+                    //        var recipeI = _context.RecipeIngredients.FindAsync(I.IngredientId);
+                    //        _context.Remove(recipeI);
+                    //        _context.SaveChanges();
+                    //    }
+                    //});
+
                     _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
                 }

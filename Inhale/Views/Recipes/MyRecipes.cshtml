@@ -12,18 +12,14 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Recipe Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RecipeNotes)
+                Notes
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RecipeType)
+                Category
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -38,14 +34,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.RecipeType.Name)
             </td>
+
+
             <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new { id = item.RecipeId })
-            </td>
-            <td>
-                @Html.ActionLink("Delete", "Delete", new { id = item.RecipeId })
+                <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
             </td>
         </tr>
 }
