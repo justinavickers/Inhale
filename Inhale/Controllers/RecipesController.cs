@@ -177,16 +177,22 @@ namespace Inhale.Controllers
                     });
 
 
-                    //ingredientsInRecipe.ForEach(I =>
-                    //{
-                    //    var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
-                    //    if(foundIngredient == 0)
-                    //    {
-                    //        var recipeI = _context.RecipeIngredients.FindAsync(I.IngredientId);
-                    //        _context.Remove(recipeI);
-                    //        _context.SaveChanges();
-                    //    }
-                    //});
+                    ingredientsInRecipe.ForEach(I =>
+                    {
+                        var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
+                        if (foundIngredient == 0)
+                        {
+                            var recipeI = new RecipeIngredients
+                            { 
+                                IngredientId = I.IngredientId,
+                                RecipeIngredientId = I.RecipeIngredientId,
+                                Recipe = I.Recipe,
+                                Amount = "0"
+                            };
+                            _context.Remove(recipeI);
+                            _context.SaveChanges();
+                        }
+                    });
 
                     _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
@@ -264,25 +270,19 @@ namespace Inhale.Controllers
                 });
 
             return View(recipes);
-            //var applicationDbContext1 = _context.Recipes.Include(r => r.RecipeType)
-            //       .Include(r => r.User)
-            //       .Include(r => r.RecipeId)
-            //       .ThenInclude(op => op.Order)
-            //       .Where(p => p.UserId == user.Id)
-            //       .Select(p => new Product
-            //       {
-            //           ProductId = p.ProductId,
-            //           DateCreated = p.DateCreated,
-            //           Description = p.Description,
-            //           Title = p.Title,
-            //           Price = p.Price,
-            //           Quantity = p.Quantity,
-            //           UserId = p.UserId,
-            //           City = p.City,
-            //           ImagePath = p.ImagePath,
-            //           ProductTypeId = p.ProductTypeId,
-            //           OrderProducts = p.OrderProducts.Where(op => op.Order.DateCompleted != null).ToList()
-            //       });
+          
+
+        }
+
+        //POST: Recipe/ingredient
+        public async Task<IActionResult> addIngredient(NewRecipeViewModel viewModel)
+        {
+            foreach (var selectedIngredientIndex in viewModel.SelectedIngredients) {
+                var index = Convert.ToInt32(selectedIngredientIndex) - 1;
+                var selectedIngredient = viewModel.IngredientsList[index];
+                viewModel.IngredientsToEdit.Add(selectedIngredient.IngredientId, "");
+            }
+            return null;
 
         }
     }
