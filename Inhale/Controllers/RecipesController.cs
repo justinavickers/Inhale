@@ -76,9 +76,8 @@ namespace Inhale.Controllers
         }
 
         // GET: Recipes/Create
-        public async Task<IActionResult> CreateAsync()
+        public IActionResult Create()
         {
-            var user = await GetCurrentUserAsync();
 
             NewRecipeViewModel viewModel = new NewRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
 
@@ -291,15 +290,15 @@ namespace Inhale.Controllers
         }
 
         //POST: Recipe/ingredient
-        public async Task<IActionResult> addIngredient(NewRecipeViewModel viewModel)
-        {
-            foreach (var selectedIngredientIndex in viewModel.SelectedIngredients) {
-                var index = Convert.ToInt32(selectedIngredientIndex) - 1;
-                var selectedIngredient = viewModel.IngredientsList[index];
-                viewModel.IngredientsToEdit.Add(selectedIngredient.IngredientId, "");
-            }
-            return null;
+        //public async Task<IActionResult> addIngredient(NewRecipeViewModel viewModel)
+        //{
+        //    foreach (var selectedIngredientIndex in viewModel.SelectedIngredients) {
+        //        var index = Convert.ToInt32(selectedIngredientIndex) - 1;
+        //        var selectedIngredient = viewModel.IngredientsList[index];
+        //        viewModel.IngredientsToEdit.Add(selectedIngredient.IngredientId, "");
+        //    }
+        //    return null;
 
-        }
+        //}
     }
 }
