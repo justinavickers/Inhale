@@ -25,10 +25,13 @@ namespace Inhale.Controllers
             _context = ctx;
         }
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+
         [Authorize]
         // GET: Recipes
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var user = await GetCurrentUserAsync();
+
 
             List<Recipe> recipes = _context.Recipes.ToList();
 
@@ -43,13 +46,17 @@ namespace Inhale.Controllers
 
                 });
 
-            return View(recipes);
+            var filteredRecipes = recipes.Where(r => r.UserId != user.Id).ToList();
+
+            return View(filteredRecipes);
 
         }
 
         // GET: Recipes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            var user = await GetCurrentUserAsync();
+
             if (id == null)
             {
                 return NotFound();
@@ -69,8 +76,10 @@ namespace Inhale.Controllers
         }
 
         // GET: Recipes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
+            var user = await GetCurrentUserAsync();
+
             NewRecipeViewModel viewModel = new NewRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
 
             return View(viewModel);
@@ -119,6 +128,8 @@ namespace Inhale.Controllers
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var user = await GetCurrentUserAsync();
+
             EditRecipeViewModel viewModel = new EditRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
 
             if (id == null)
@@ -177,22 +188,22 @@ namespace Inhale.Controllers
                     });
 
 
-                    ingredientsInRecipe.ForEach(I =>
-                    {
-                        var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
-                        if (foundIngredient == 0)
-                        {
-                            var recipeI = new RecipeIngredients
-                            { 
-                                IngredientId = I.IngredientId,
-                                RecipeIngredientId = I.RecipeIngredientId,
-                                Recipe = I.Recipe,
-                                Amount = "0"
-                            };
-                            _context.Remove(recipeI);
-                            _context.SaveChanges();
-                        }
-                    });
+                    //ingredientsInRecipe.ForEach(I =>
+                    //{
+                    //    var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
+                    //    if (foundIngredient == 0)
+                    //    {
+                    //        var recipeI = new RecipeIngredients
+                    //        { 
+                    //            IngredientId = I.IngredientId,
+                    //            RecipeIngredientId = I.RecipeIngredientId,
+                    //            Recipe = I.Recipe,
+                    //            Amount = "0"
+                    //        };
+                    //        _context.Remove(recipeI);
+                    //        _context.SaveChanges();
+                    //    }
+                    //});
 
                     _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
@@ -218,6 +229,8 @@ namespace Inhale.Controllers
         // GET: Recipes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var user = await GetCurrentUserAsync();
+
             if (id == null)
             {
                 return NotFound();
@@ -269,7 +282,10 @@ namespace Inhale.Controllers
 
                 });
 
-            return View(recipes);
+            var filteredRecipes = recipes.Where(r => r.UserId == user.Id).ToList();
+
+
+            return View(filteredRecipes);
           
 
         }
