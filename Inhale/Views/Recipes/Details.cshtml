@@ -1,4 +1,4 @@
-﻿@model Inhale.Models.Recipe
+﻿@model Inhale.Models.DetailRecipeViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -34,20 +34,28 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.RecipeType.Name)
         </dd>
+
+
         <dt class="col-sm-2">
             Ingredients
         </dt>
+
         <dt class="col-sm-2" hidden>
             @Html.DisplayNameFor(model => model.RecipeIngredients)
         </dt>
-        
-            @foreach (var r in Model.RecipeIngredients)
+
+
+        @foreach (var ingredient in Model.IngredientsList)
+        {
+            
+            @if (Model.IngredientsWithAmount.ContainsKey(ingredient.IngredientId))
             {
                 <dd>
-                       @Html.DisplayFor(modelItem => r.Ingredient.Name )
+                    @ingredient.Name - @Model.IngredientsWithAmount[ingredient.IngredientId] ;
                 </dd>
             }
-        
+        }
+
         <dt class="col-sm-2" hidden>
             @Html.DisplayNameFor(model => model.User)
         </dt>

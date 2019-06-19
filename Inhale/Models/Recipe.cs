@@ -16,5 +16,6 @@ namespace Inhale.Models
         public ApplicationUser User { get; set; }
         public virtual ICollection<FavoriteRecipes> FavoriteRecipes { get; set;  }
         public virtual ICollection<RecipeIngredients> RecipeIngredients { get; set; }
+     
     }
 }

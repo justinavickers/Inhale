@@ -62,17 +62,44 @@ namespace Inhale.Controllers
                 return NotFound();
             }
 
-            var recipe = await _context.Recipes
-                .Include(r => r.RecipeType)
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.RecipeId == id);
+            var recipe = await _context.Recipes.FindAsync(id);
             if (recipe == null)
             {
                 return NotFound();
             }
+
             recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
 
-            return View(recipe);
+            DetailRecipeViewModel viewModel = new DetailRecipeViewModel(
+                _context.Ingredients.ToList(),
+                recipe.RecipeIngredients.ToList());
+
+            viewModel.Name = recipe.Name;
+            viewModel.RecipeNotes = recipe.RecipeNotes;
+            viewModel.RecipeId = recipe.RecipeId;
+            viewModel.RecipeType = recipe.RecipeType;
+
+            return View(viewModel);
+
+            //var recipe = await _context.Recipes
+            //    .Include(r => r.RecipeType)
+            //    .Include(r => r.User)
+            //    .FirstOrDefaultAsync(m => m.RecipeId == id);
+            //if (recipe == null)
+            //{
+            //    return NotFound();
+            //}
+            //recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
+            //recipe.IngredientsList = _context.Ingredients.ToList();
+
+            //recipe.IngredientsWithAmount = new Dictionary<int, string>();
+            //foreach (var ingredient in recipe.IngredientsList)
+            //{
+            //    var recipeIngredient = recipe.RecipeIngredients.Find(x => x.IngredientId == ingredient.IngredientId);
+            //    recipe.IngredientsWithAmount.Add(ingredient.IngredientId, recipeIngredient != null ? recipeIngredient.Amount : "");
+            //}
+
+            //return View(recipe);
         }
 
         // GET: Recipes/Create
@@ -222,41 +249,6 @@ namespace Inhale.Controllers
                         }
                     }
 
-                    /*viewModel.SelectedIngredients.ForEach(i =>
-                    {
-                        var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == i);
-                        if(foundRecipe == null)
-                        {
-
-                        var ri = new RecipeIngredients
-                        {
-                            IngredientId = i,
-                            Recipe = viewModel.Recipe,
-                            Amount = "0"
-                        };
-                        _context.Update(ri);
-                        _context.SaveChanges();
-                        }
-                    });*/
-
-
-                    //ingredientsInRecipe.ForEach(I =>
-                    //{
-                    //    var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
-                    //    if (foundIngredient == 0)
-                    //    {
-                    //        var recipeI = new RecipeIngredients
-                    //        { 
-                    //            IngredientId = I.IngredientId,
-                    //            RecipeIngredientId = I.RecipeIngredientId,
-                    //            Recipe = I.Recipe,
-                    //            Amount = "0"
-                    //        };
-                    //        _context.Remove(recipeI);
-                    //        _context.SaveChanges();
-                    //    }
-                    //});
-
                     _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
                 }
@@ -316,13 +308,12 @@ namespace Inhale.Controllers
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
 
-        // GET: Products/MyRecipes
+        // GET: Recipes/MyRecipes
         public async Task<IActionResult> MyRecipes()
         {
             var user = await GetCurrentUserAsync();
-            //get only the user's (who is logged in) products 
+           
             List<Recipe> recipes = _context.Recipes.ToList();
-
 
             recipes.ForEach(
                 r =>
@@ -341,17 +332,5 @@ namespace Inhale.Controllers
 
 
         }
-
-        //POST: Recipe/ingredient
-        //public async Task<IActionResult> addIngredient(NewRecipeViewModel viewModel)
-        //{
-        //    foreach (var selectedIngredientIndex in viewModel.SelectedIngredients) {
-        //        var index = Convert.ToInt32(selectedIngredientIndex) - 1;
-        //        var selectedIngredient = viewModel.IngredientsList[index];
-        //        viewModel.IngredientsToEdit.Add(selectedIngredient.IngredientId, "");
-        //    }
-        //    return null;
-
-        //}
     }
 }
