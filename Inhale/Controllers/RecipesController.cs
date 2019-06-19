@@ -36,26 +36,9 @@ namespace Inhale.Controllers
             List<Recipe> recipes = _context.Recipes
                 .Include("RecipeIngredients.Ingredient")
                 .Include(r => r.FavoriteRecipes)
+                .Include(r => r.RecipeType)
+                .Where(r => r.UserId != user.Id)
                 .ToList();
-
-
-
-            //recipes.ForEach(
-            //    r =>
-            //    {
-            //        r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
-            //        .Where(ing => ing.RecipeId == r.RecipeId).ToList();
-            //        r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
-            //        r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
-
-            //    });
-
-            //var filteredRecipes = recipes.Where(r => r.UserId != user.Id).ToList();
-
-            //foreach (Recipe recipe in filteredRecipes)
-            //{
-            //    recipe.FavoriteRecipes = recipe.FavoriteRecipes.Where(fr => fr.UserId == user.Id).ToList();
-            //}
 
             return View(recipes);
 
@@ -136,21 +119,8 @@ namespace Inhale.Controllers
                     }
                 }
 
-                /*viewModel.SelectedIngredients.ForEach(i =>
-                {
-                    var ri = new RecipeIngredients
-                    {
-                        IngredientId = i,
-                        Recipe = viewModel.Recipe,
-                        Amount = "0"
-                    };
-                    _context.Add(ri);
-                    _context.SaveChanges();
 
-                });*/
-
-
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(MyRecipes));
             }
             ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "RecipeTypeId", viewModel.Recipe.RecipeTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", viewModel.Recipe.UserId);
@@ -289,7 +259,7 @@ namespace Inhale.Controllers
             var recipe = await _context.Recipes.FindAsync(id);
             _context.Recipes.Remove(recipe);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MyRecipes));
         }
 
         private bool RecipeExists(int id)

@@ -8,33 +8,46 @@
     <div class="recipeCards">
         @foreach (var item in Model)
         {
-                <div class="recipeCard">
+        <div class="recipeCard">
             <div class="recipeName">
-                    @Html.DisplayFor(modelItem => item.Recipe.Name)
-                </div>
-
-                <div>
-                    @Html.DisplayFor(modelItem => item.Recipe.RecipeNotes)
-                </div>
-
-                <div>
-                    @Html.DisplayFor(modelItem => item.Recipe.RecipeType.Name)
-                </div>
-                @foreach (var r in item.Recipe.RecipeIngredients)
-                {
-                    <div>
-                        @Html.DisplayFor(modelItem => r.Ingredient.Name)
-                    </div>
-                }
-
-                <div>
-                    <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId" title="Delete">
-                        <span style="color: black;">
-                            <i class="far fa-trash-alt"></i>
-                        </span>
-                    </a>
-                </div>
-
+                @Html.DisplayFor(modelItem => item.Recipe.Name)
             </div>
+            <div>
+                @Html.DisplayFor(modelItem => item.Recipe.RecipeType.Name)
+            </div>
+            <div>
+                @Html.DisplayFor(modelItem => item.Recipe.RecipeNotes)
+            </div>
+
+
+            <hr />
+            <div class="recipeCardIngredients">
+                <ul>
+                    @foreach (var ri in item.Recipe.RecipeIngredients)
+                    {
+                        <li>
+                            @ri.Ingredient.Name, @ri.Amount
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            @*<ul>
+            @foreach (var r in item.Recipe.RecipeIngredients)
+            {
+                <ul>
+                    @Html.DisplayFor(modelItem => r.Ingredient.Name)
+                </ul>
+            }
+        </ul>*@
+            <div>
+                <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId" title="Delete">
+                    <span style="color: black;">
+                        <i class="far fa-trash-alt"></i>
+                    </span>
+                </a>
+            </div>
+
+        </div>
         }
     </div>
