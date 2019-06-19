@@ -62,7 +62,7 @@ namespace Inhale.Controllers
                 return NotFound();
             }
 
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes.Include(r => r.RecipeType).FirstOrDefaultAsync(r => r.RecipeId == id);
             if (recipe == null)
             {
                 return NotFound();
