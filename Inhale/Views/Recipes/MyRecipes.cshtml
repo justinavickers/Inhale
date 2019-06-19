@@ -9,24 +9,32 @@
     <a asp-action="Create">Add Recipe</a>
 </p>
 <div class="recipeCards">
-    @foreach (var item in Model)
+    @foreach (var recipe in Model)
     {
     <div class="recipeCard">
         <div class="recipeName">
-            @Html.DisplayFor(modelItem => item.Name)
+            @Html.DisplayFor(modelItem => recipe.Name)
         </div>
         <div>
-            @Html.DisplayFor(modelItem => item.RecipeNotes)
+            @Html.DisplayFor(modelItem => recipe.RecipeNotes)
         </div>
         <div>
-            @Html.DisplayFor(modelItem => item.RecipeType.Name)
+            @Html.DisplayFor(modelItem => recipe.RecipeType.Name)
         </div>
-        
+        @{
+            @String.Join(", ", recipe.RecipeIngredients.Select(ri => ri.Ingredient.Name))
+            @String.Join(", ", recipe.RecipeIngredients.Select(ri => ri.Amount))
+
+
+        }
 
         <div>
-            <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
+            <a asp-action="Edit" asp-route-id="@recipe.RecipeId">Edit</a> |
+            <a asp-action="Delete" asp-route-id="@recipe.RecipeId" title="Delete">
+                <span style="color: black;">
+                    <i class="far fa-trash-alt"></i>
+                </span>
+            </a>
         </div>
     </div>
     }

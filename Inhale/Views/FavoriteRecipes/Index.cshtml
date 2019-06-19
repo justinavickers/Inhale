@@ -28,7 +28,11 @@
                 }
 
                 <div>
-                    <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId">Remove</a>
+                    <a asp-action="Delete" asp-route-id="@item.FavoriteRecipesId" title="Delete">
+                        <span style="color: black;">
+                            <i class="far fa-trash-alt"></i>
+                        </span>
+                    </a>
                 </div>
 
             </div>

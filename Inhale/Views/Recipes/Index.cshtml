@@ -15,47 +15,48 @@
     @foreach (var recipe in Model)
     {
 
-        <div class="recipeCard">
-            <div class="recipeName">
-                @Html.DisplayFor(modelItem => recipe.Name)
-            </div>
-
-            <div>
-                @Html.DisplayFor(modelItem => recipe.RecipeType.Name)
-            </div>
-            <div>
-                @Html.DisplayFor(modelItem => recipe.User.FirstName)
-            </div>
-
-            @{ 
-                @String.Join(", ", recipe.RecipeIngredients.Select(ri => ri.Ingredient.Name))
-
-            }
-
-            <div>
-                <div>
-                    @if (recipe.FavoriteRecipes.Count > 0)
-                    {
-                        <span style="color: #D35439;">
-                            <i class="fas fa-heart style=color:#ff0000"></i>
-                        </span>
-                    }
-                    else
-                    {
-                        <a asp-action="Create" asp-controller="FavoriteRecipes" asp-route-id="@recipe.RecipeId">
-                            <i class="far fa-heart"></i>
-                        </a>
-                    }
-                    <a asp-action="Delete" asp-route-id="@recipe.RecipeId" title="Delete">
-                        <span style="color: black;">
-                            <i class="far fa-trash-alt"></i>
-                        </span>
-                    </a>
-                </div>
-
-
-
-            </div>
+    <div class="recipeCard">
+        <div class="recipeName">
+            @Html.DisplayFor(modelItem => recipe.Name)
         </div>
+
+        <div>
+            @Html.DisplayFor(modelItem => recipe.RecipeType.Name)
+        </div>
+        <div>
+            @Html.DisplayFor(modelItem => recipe.User.FirstName)
+        </div>
+
+        @{
+            @String.Join(", ", recipe.RecipeIngredients.Select(ri => ri.Ingredient.Name))
+            @String.Join(", ", recipe.RecipeIngredients.Select(ri => ri.Amount))
+
+        }
+
+        <div>
+            <div>
+                @if (recipe.FavoriteRecipes.Count > 0)
+                {
+                    <span style="color: #D35439;">
+                        <i class="fas fa-heart style=color:#ff0000"></i>
+                    </span>
+                }
+                else
+                {
+                    <a asp-action="Create" asp-controller="FavoriteRecipes" asp-route-id="@recipe.RecipeId">
+                        <i class="far fa-heart"></i>
+                    </a>
+                }
+                <a asp-action="Delete" asp-route-id="@recipe.RecipeId" title="Delete">
+                    <span style="color: black;">
+                        <i class="far fa-trash-alt"></i>
+                    </span>
+                </a>
+            </div>
+
+
+
+        </div>
+    </div>
     }
 </div>
