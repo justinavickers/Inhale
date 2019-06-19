@@ -1,56 +1,40 @@
 ﻿@model IEnumerable<Inhale.Models.Recipe>
 
 
-@{
+    @{
     ViewData["Title"] = "Index";
-}
+    }
 
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Recipe Name
-            </th>
-            <th>
-                Category
-            </th>
-            <th>
-                Created By
-            </th>
-            <th>
-                Favorite
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <p>
+        <a asp-action="Create"> Add Recipe</a>
+    </p>
+ 
 
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-          
-            <td>
-                @Html.DisplayFor(modelItem => item.RecipeType.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.FirstName)
-            </td>
-       
-          
+    <div class="recipeCards">
+            @foreach (var item in Model)
+            {
 
-            <td>
-            <form asp-action="Create" asp-controller="FavoriteRecipes" asp-route-id="@item.RecipeId"><input type="Submit" value="Favorite" class="btn btn-primary"/></form>
-            <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
+                <div class="recipeCard">
+                    <div>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </div>
+
+                    <div>
+                        @Html.DisplayFor(modelItem => item.RecipeType.Name)
+                    </div>
+                    <div>
+                        @Html.DisplayFor(modelItem => item.User.FirstName)
+                    </div>
+
+
+
+                    <div>
+                        <form asp-action="Create" asp-controller="FavoriteRecipes" asp-route-id="@item.RecipeId"><input type="Submit" value="Favorite" class="btn btn-primary" /></form>
+                        <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
+                    </div>
+                </div>
+            }
+    </div>

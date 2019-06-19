@@ -5,24 +5,20 @@
 }
 
 
-<table class="table">
-   
-    <tbody>
-@foreach (var item in Model)
-{
-    @if (item.IsOil)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
+<div class="ingredientList">
+     @foreach (var item in Model)
+     { 
+         @if (item.IsOil)
+         { 
+         <div class="ingredient">
+            <div style="margin-bottom: 6px">
+                <strong>@Html.DisplayFor(modelItem => item.Name)</strong>
+            </div>
+            <div>
                 @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            
-           
-        </tr>
+            </div>
+        </div>
+        <hr/>
         }
     }
-    </tbody>
-</table>
+</div>
