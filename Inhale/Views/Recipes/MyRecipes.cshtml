@@ -11,23 +11,23 @@
 <div class="recipeCards">
     @foreach (var item in Model)
     {
-        <div class="recipeCard">
-            <div>
-                @Html.DisplayFor(modelItem => item.Name)
-            </div>
-            <div>
-                @Html.DisplayFor(modelItem => item.RecipeNotes)
-            </div>
-            <div>
-                @Html.DisplayFor(modelItem => item.RecipeType.Name)
-            </div>
-
-
-            <div>
-                <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
-            </div>
+    <div class="recipeCard">
+        <div class="recipeName">
+            @Html.DisplayFor(modelItem => item.Name)
         </div>
+        <div>
+            @Html.DisplayFor(modelItem => item.RecipeNotes)
+        </div>
+        <div>
+            @Html.DisplayFor(modelItem => item.RecipeType.Name)
+        </div>
+        
+
+        <div>
+            <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
+        </div>
+    </div>
     }
 </div>

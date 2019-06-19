@@ -27,3 +27,8 @@
     padding: 12px;
     border-radius: 10px;
 }
+
+.recipeName {
+    color: seagreen;
+    font-size: larger;
+}
