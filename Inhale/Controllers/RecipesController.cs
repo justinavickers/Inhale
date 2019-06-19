@@ -25,43 +25,38 @@ namespace Inhale.Controllers
             _context = ctx;
         }
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+
         [Authorize]
         // GET: Recipes
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var user = await GetCurrentUserAsync();
+
 
             List<Recipe> recipes = _context.Recipes.ToList();
 
 
             recipes.ForEach(
-                r => {
+                r =>
+                {
                     r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
                     .Where(ing => ing.RecipeId == r.RecipeId).ToList();
                     r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
                     r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
 
-            }); 
-            //_context.RecipeIngredients.Where(ri => ri.RecipeId == r.RecipeId).ToList());
+                });
 
-            // List<List<IGrouping<int, RecipeIngredients>>> recipeIngredientsList = new List<List<IGrouping<int, RecipeIngredients>>>();
-            // var recipeIngredients = _context.RecipeIngredients
-            //    .Include(ri => ri.Ingredient)
-            //    .Include(ri => ri.Recipe)
-            //    .ThenInclude(r => r.RecipeType)
-            //    .Include(ri => ri.Recipe)
-            //    .ThenInclude(r => r.User)
-            //    .GroupBy(ri => ri.RecipeId).ToList();
+            var filteredRecipes = recipes.Where(r => r.UserId != user.Id).ToList();
 
-            //recipeIngredientsList.Add(recipeIngredients);
-
-            //return View(recipeIngredientsList.AsEnumerable());
-            return View(recipes);
+            return View(filteredRecipes);
 
         }
 
         // GET: Recipes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            var user = await GetCurrentUserAsync();
+
             if (id == null)
             {
                 return NotFound();
@@ -83,10 +78,9 @@ namespace Inhale.Controllers
         // GET: Recipes/Create
         public IActionResult Create()
         {
+
             NewRecipeViewModel viewModel = new NewRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
 
-            //ViewData["RecipeTypeId"] = new SelectList(_context.RecipeType, "RecipeTypeId", "Name");
-            //ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View(viewModel);
         }
 
@@ -109,7 +103,24 @@ namespace Inhale.Controllers
                 _context.Add(viewModel.Recipe);
                 await _context.SaveChangesAsync();
 
-                viewModel.SelectedIngredients.ForEach(i =>
+                foreach (var ingredientId in viewModel.IngredientsWithAmount.Keys)
+                {
+                    var amount = viewModel.IngredientsWithAmount[ingredientId];
+
+                    if (!String.IsNullOrEmpty(amount))
+                    {
+                        var ri = new RecipeIngredients
+                        {
+                            IngredientId = ingredientId,
+                            RecipeId = viewModel.Recipe.RecipeId,
+                            Amount = amount
+                        };
+                        _context.Add(ri);
+                        _context.SaveChanges();
+                    }
+                }
+
+                /*viewModel.SelectedIngredients.ForEach(i =>
                 {
                     var ri = new RecipeIngredients
                     {
@@ -120,7 +131,7 @@ namespace Inhale.Controllers
                     _context.Add(ri);
                     _context.SaveChanges();
 
-                });
+                });*/
 
 
                 return RedirectToAction(nameof(Index));
@@ -133,18 +144,26 @@ namespace Inhale.Controllers
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            EditRecipeViewModel viewModel = new EditRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
-
             if (id == null)
             {
                 return NotFound();
             }
+
+            /*var user = await GetCurrentUserAsync();*/
 
             var recipe = await _context.Recipes.FindAsync(id);
             if (recipe == null)
             {
                 return NotFound();
             }
+
+            recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
+
+            EditRecipeViewModel viewModel = new EditRecipeViewModel(
+                _context.Ingredients.ToList(),
+                _context.RecipeType.ToList(),
+                recipe.RecipeIngredients.ToList());
+
 
             viewModel.Recipe = recipe;
 
@@ -169,9 +188,75 @@ namespace Inhale.Controllers
             if (ModelState.IsValid)
             {
                 viewModel.Recipe.RecipeTypeId = viewModel.SelectedRecipeType;
+                var ingredientsInRecipe = _context.RecipeIngredients.Where(ri => ri.RecipeId == id).ToList();
 
                 try
                 {
+                    foreach (var ingredientId in viewModel.IngredientsWithAmount.Keys)
+                    {
+                        var amount = viewModel.IngredientsWithAmount[ingredientId];
+                        var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == ingredientId);
+
+                        if (foundRecipe == null && !String.IsNullOrEmpty(amount))
+                        {
+                            var ri = new RecipeIngredients
+                            {
+                                IngredientId = ingredientId,
+                                RecipeId = viewModel.Recipe.RecipeId,
+                                Amount = amount
+                            };
+                            _context.Add(ri);
+                            _context.SaveChanges();
+                        }
+                        else if (foundRecipe != null && !String.IsNullOrEmpty(amount))
+                        {
+                            foundRecipe.Amount = amount;
+
+                            _context.Update(foundRecipe);
+                            _context.SaveChanges();
+                        }
+                        else if (foundRecipe != null && String.IsNullOrEmpty(amount))
+                        {
+                            _context.Remove(foundRecipe);
+                            _context.SaveChanges();
+                        }
+                    }
+
+                    /*viewModel.SelectedIngredients.ForEach(i =>
+                    {
+                        var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == i);
+                        if(foundRecipe == null)
+                        {
+
+                        var ri = new RecipeIngredients
+                        {
+                            IngredientId = i,
+                            Recipe = viewModel.Recipe,
+                            Amount = "0"
+                        };
+                        _context.Update(ri);
+                        _context.SaveChanges();
+                        }
+                    });*/
+
+
+                    //ingredientsInRecipe.ForEach(I =>
+                    //{
+                    //    var foundIngredient = viewModel.SelectedIngredients.SingleOrDefault(i => i == I.IngredientId);
+                    //    if (foundIngredient == 0)
+                    //    {
+                    //        var recipeI = new RecipeIngredients
+                    //        { 
+                    //            IngredientId = I.IngredientId,
+                    //            RecipeIngredientId = I.RecipeIngredientId,
+                    //            Recipe = I.Recipe,
+                    //            Amount = "0"
+                    //        };
+                    //        _context.Remove(recipeI);
+                    //        _context.SaveChanges();
+                    //    }
+                    //});
+
                     _context.Update(viewModel.Recipe);
                     await _context.SaveChangesAsync();
                 }
@@ -196,6 +281,8 @@ namespace Inhale.Controllers
         // GET: Recipes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var user = await GetCurrentUserAsync();
+
             if (id == null)
             {
                 return NotFound();
@@ -228,5 +315,43 @@ namespace Inhale.Controllers
         {
             return _context.Recipes.Any(e => e.RecipeId == id);
         }
+
+        // GET: Products/MyRecipes
+        public async Task<IActionResult> MyRecipes()
+        {
+            var user = await GetCurrentUserAsync();
+            //get only the user's (who is logged in) products 
+            List<Recipe> recipes = _context.Recipes.ToList();
+
+
+            recipes.ForEach(
+                r =>
+                {
+                    r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
+                    .Where(ing => ing.RecipeId == r.RecipeId).ToList();
+                    r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
+                    r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
+
+                });
+
+            var filteredRecipes = recipes.Where(r => r.UserId == user.Id).ToList();
+
+
+            return View(filteredRecipes);
+
+
+        }
+
+        //POST: Recipe/ingredient
+        //public async Task<IActionResult> addIngredient(NewRecipeViewModel viewModel)
+        //{
+        //    foreach (var selectedIngredientIndex in viewModel.SelectedIngredients) {
+        //        var index = Convert.ToInt32(selectedIngredientIndex) - 1;
+        //        var selectedIngredient = viewModel.IngredientsList[index];
+        //        viewModel.IngredientsToEdit.Add(selectedIngredient.IngredientId, "");
+        //    }
+        //    return null;
+
+        //}
     }
 }

@@ -12,7 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Recipe.RecipeId"/>
+            <input type="hidden" asp-for="Recipe.RecipeId" />
             <div class="form-group">
                 <label asp-for="Recipe.Name" class="control-label">Name</label>
                 <input asp-for="Recipe.Name" class="form-control" />
@@ -27,10 +27,25 @@
                 <label asp-for="SelectedRecipeType" class="control-label">Category</label>
                 <select asp-for="SelectedRecipeType" class="form-control" asp-items="@Model.RecipeTypes"></select>
             </div>
-            <div class="form-group">
-                <label asp-for="SelectedIngredients" class="control-label">Ingredients</label>
-                <select asp-for="SelectedIngredients" class="form-control" asp-items="@Model.Ingredients"></select>
-            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Ingredient</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ingredient in Model.IngredientsList)
+                    {
+                        <tr>
+                            <th scope="row">@ingredient.Name</th>
+                            <td><input type="text" asp-for="IngredientsWithAmount[ingredient.IngredientId]" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
             <div class="form-group" hidden>
                 <label asp-for="Recipe.UserId" type="hidden" class="control-label"></label>
                 <select asp-for="Recipe.UserId" type="hidden" class="form-control" asp-items="ViewBag.UserId"></select>
