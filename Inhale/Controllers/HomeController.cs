@@ -15,7 +15,7 @@ namespace Inhale.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Recipes");
         }
 
         public IActionResult Privacy()

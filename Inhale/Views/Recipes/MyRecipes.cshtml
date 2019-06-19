@@ -6,42 +6,28 @@
 
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Add Recipe</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Recipe Name
-            </th>
-            <th>
-                Notes
-            </th>
-            <th>
-                Category
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
+<div class="recipeCards">
+    @foreach (var item in Model)
+    {
+        <div class="recipeCard">
+            <div>
                 @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
+            </div>
+            <div>
                 @Html.DisplayFor(modelItem => item.RecipeNotes)
-            </td>
-            <td>
+            </div>
+            <div>
                 @Html.DisplayFor(modelItem => item.RecipeType.Name)
-            </td>
+            </div>
 
 
-            <td>
+            <div>
                 <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            </div>
+        </div>
+    }
+</div>
