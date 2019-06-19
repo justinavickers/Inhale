@@ -15,12 +15,15 @@ namespace Inhale.Models.ViewModels
         public IEnumerable<SelectListItem> RecipeTypes { get; set; }
         public int SelectedRecipeType { get; set; }
 
+        public List<Ingredient> IngredientsList { get; set; }
+        public Dictionary<int, string> IngredientsWithAmount { get; set; }
 
 
 
-
-        public EditRecipeViewModel(List<Ingredient> ingredients, List<RecipeType> recipes)
+        public EditRecipeViewModel(List<Ingredient> ingredients, List<RecipeType> recipes, List<RecipeIngredients> recipeIngredients)
         {
+            IngredientsList = ingredients;
+
             Ingredients = ingredients.Select(e => new SelectListItem
             {
                 Text = e.Name,
@@ -32,7 +35,16 @@ namespace Inhale.Models.ViewModels
                 Text = e.Name,
                 Value = e.RecipeTypeId.ToString(),
             }).ToList();
+
             Recipe = new Recipe();
+
+            IngredientsWithAmount = new Dictionary<int, string>();
+
+            foreach (var ingredient in ingredients)
+            {
+                var recipeIngredient = recipeIngredients.Find(x => x.IngredientId == ingredient.IngredientId);
+                IngredientsWithAmount.Add(ingredient.IngredientId, recipeIngredient != null ? recipeIngredient.Amount : "");
+            }
         }
 
         public EditRecipeViewModel()

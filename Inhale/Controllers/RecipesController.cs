@@ -103,7 +103,24 @@ namespace Inhale.Controllers
                 _context.Add(viewModel.Recipe);
                 await _context.SaveChangesAsync();
 
-                viewModel.SelectedIngredients.ForEach(i =>
+                foreach (var ingredientId in viewModel.IngredientsWithAmount.Keys)
+                {
+                    var amount = viewModel.IngredientsWithAmount[ingredientId];
+
+                    if (!String.IsNullOrEmpty(amount))
+                    {
+                        var ri = new RecipeIngredients
+                        {
+                            IngredientId = ingredientId,
+                            RecipeId = viewModel.Recipe.RecipeId,
+                            Amount = amount
+                        };
+                        _context.Add(ri);
+                        _context.SaveChanges();
+                    }
+                }
+
+                /*viewModel.SelectedIngredients.ForEach(i =>
                 {
                     var ri = new RecipeIngredients
                     {
@@ -114,7 +131,7 @@ namespace Inhale.Controllers
                     _context.Add(ri);
                     _context.SaveChanges();
 
-                });
+                });*/
 
 
                 return RedirectToAction(nameof(Index));
@@ -127,20 +144,26 @@ namespace Inhale.Controllers
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            var user = await GetCurrentUserAsync();
-
-            EditRecipeViewModel viewModel = new EditRecipeViewModel(_context.Ingredients.ToList(), _context.RecipeType.ToList());
-
             if (id == null)
             {
                 return NotFound();
             }
+
+            /*var user = await GetCurrentUserAsync();*/
 
             var recipe = await _context.Recipes.FindAsync(id);
             if (recipe == null)
             {
                 return NotFound();
             }
+
+            recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
+
+            EditRecipeViewModel viewModel = new EditRecipeViewModel(
+                _context.Ingredients.ToList(),
+                _context.RecipeType.ToList(),
+                recipe.RecipeIngredients.ToList());
+
 
             viewModel.Recipe = recipe;
 
@@ -165,11 +188,41 @@ namespace Inhale.Controllers
             if (ModelState.IsValid)
             {
                 viewModel.Recipe.RecipeTypeId = viewModel.SelectedRecipeType;
-                var ingredientsInRecipe =  _context.RecipeIngredients.Where(ri => ri.RecipeId == id).ToList();
+                var ingredientsInRecipe = _context.RecipeIngredients.Where(ri => ri.RecipeId == id).ToList();
 
                 try
                 {
-                    viewModel.SelectedIngredients.ForEach(i =>
+                    foreach (var ingredientId in viewModel.IngredientsWithAmount.Keys)
+                    {
+                        var amount = viewModel.IngredientsWithAmount[ingredientId];
+                        var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == ingredientId);
+
+                        if (foundRecipe == null && !String.IsNullOrEmpty(amount))
+                        {
+                            var ri = new RecipeIngredients
+                            {
+                                IngredientId = ingredientId,
+                                RecipeId = viewModel.Recipe.RecipeId,
+                                Amount = amount
+                            };
+                            _context.Add(ri);
+                            _context.SaveChanges();
+                        }
+                        else if (foundRecipe != null && !String.IsNullOrEmpty(amount))
+                        {
+                            foundRecipe.Amount = amount;
+
+                            _context.Update(foundRecipe);
+                            _context.SaveChanges();
+                        }
+                        else if (foundRecipe != null && String.IsNullOrEmpty(amount))
+                        {
+                            _context.Remove(foundRecipe);
+                            _context.SaveChanges();
+                        }
+                    }
+
+                    /*viewModel.SelectedIngredients.ForEach(i =>
                     {
                         var foundRecipe = ingredientsInRecipe.SingleOrDefault(ir => ir.IngredientId == i);
                         if(foundRecipe == null)
@@ -184,7 +237,7 @@ namespace Inhale.Controllers
                         _context.Update(ri);
                         _context.SaveChanges();
                         }
-                    });
+                    });*/
 
 
                     //ingredientsInRecipe.ForEach(I =>
@@ -285,7 +338,7 @@ namespace Inhale.Controllers
 
 
             return View(filteredRecipes);
-          
+
 
         }
 
