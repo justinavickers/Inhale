@@ -20,6 +20,8 @@
     margin: 10px;
     background-color:floralwhite;
     opacity: .9;
+    width:200px;
+    height:200px;
 }
 
 .ingredientList {
@@ -32,3 +34,4 @@
     color: seagreen;
     font-size: larger;
 }
+

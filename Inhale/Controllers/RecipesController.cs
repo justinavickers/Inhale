@@ -33,22 +33,31 @@ namespace Inhale.Controllers
             var user = await GetCurrentUserAsync();
 
 
-            List<Recipe> recipes = _context.Recipes.ToList();
+            List<Recipe> recipes = _context.Recipes
+                .Include("RecipeIngredients.Ingredient")
+                .Include(r => r.FavoriteRecipes)
+                .ToList();
 
 
-            recipes.ForEach(
-                r =>
-                {
-                    r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
-                    .Where(ing => ing.RecipeId == r.RecipeId).ToList();
-                    r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
-                    r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
 
-                });
+            //recipes.ForEach(
+            //    r =>
+            //    {
+            //        r.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient)
+            //        .Where(ing => ing.RecipeId == r.RecipeId).ToList();
+            //        r.RecipeType = _context.RecipeType.Where(rT => r.RecipeTypeId == rT.RecipeTypeId).FirstOrDefault();
+            //        r.User = _context.ApplicationUsers.Where(u => r.UserId == u.Id).FirstOrDefault();
 
-            var filteredRecipes = recipes.Where(r => r.UserId != user.Id).ToList();
+            //    });
 
-            return View(filteredRecipes);
+            //var filteredRecipes = recipes.Where(r => r.UserId != user.Id).ToList();
+
+            //foreach (Recipe recipe in filteredRecipes)
+            //{
+            //    recipe.FavoriteRecipes = recipe.FavoriteRecipes.Where(fr => fr.UserId == user.Id).ToList();
+            //}
+
+            return View(recipes);
 
         }
 
@@ -80,26 +89,6 @@ namespace Inhale.Controllers
             viewModel.RecipeType = recipe.RecipeType;
 
             return View(viewModel);
-
-            //var recipe = await _context.Recipes
-            //    .Include(r => r.RecipeType)
-            //    .Include(r => r.User)
-            //    .FirstOrDefaultAsync(m => m.RecipeId == id);
-            //if (recipe == null)
-            //{
-            //    return NotFound();
-            //}
-            //recipe.RecipeIngredients = _context.RecipeIngredients.Include(ing => ing.Ingredient).Where(ing => ing.RecipeId == recipe.RecipeId).ToList();
-            //recipe.IngredientsList = _context.Ingredients.ToList();
-
-            //recipe.IngredientsWithAmount = new Dictionary<int, string>();
-            //foreach (var ingredient in recipe.IngredientsList)
-            //{
-            //    var recipeIngredient = recipe.RecipeIngredients.Find(x => x.IngredientId == ingredient.IngredientId);
-            //    recipe.IngredientsWithAmount.Add(ingredient.IngredientId, recipeIngredient != null ? recipeIngredient.Amount : "");
-            //}
-
-            //return View(recipe);
         }
 
         // GET: Recipes/Create
