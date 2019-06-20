@@ -1,6 +1,8 @@
 ﻿body {
+    background-size: cover;
     background-image: url('img/storyblocks-natural-sage-essential-oil-with-sage-leaves-on-white-background_BiCViOvkN_SB_PM.jpg');
     margin: 0;
+    background-attachment: fixed;
 }
 
 .recipeCards {
@@ -8,22 +10,46 @@
     flex-direction: row;
     justify-content: center;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .recipeCard {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     border-radius: 5px;
-    border:groove;
+    border: groove;
     padding: 25px;
     text-align: center;
     margin: 10px;
-    background-color:floralwhite;
+    background-color: floralwhite;
     opacity: .9;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .ingredientList {
     background-color: rgba(256, 256, 256, 0.6);
     padding: 12px;
     border-radius: 10px;
+}
+
+.recipeName {
+    color: seagreen;
+    font-size: larger;
+}
+
+.recipeCardIngredients {
+    text-align: left;
+    flex-grow: 1;
+}
+
+    .recipeCardIngredients ul {
+        padding-left: 4px;
+    }
+
+.removeHeader {
+    background-color: white;
+    opacity: .8;
 }

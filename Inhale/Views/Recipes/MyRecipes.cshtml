@@ -9,25 +9,36 @@
     <a asp-action="Create">Add Recipe</a>
 </p>
 <div class="recipeCards">
-    @foreach (var item in Model)
+    @foreach (var recipe in Model)
     {
-        <div class="recipeCard">
-            <div>
-                @Html.DisplayFor(modelItem => item.Name)
-            </div>
-            <div>
-                @Html.DisplayFor(modelItem => item.RecipeNotes)
-            </div>
-            <div>
-                @Html.DisplayFor(modelItem => item.RecipeType.Name)
-            </div>
-
-
-            <div>
-                <a asp-action="Edit" asp-route-id="@item.RecipeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RecipeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RecipeId">Delete</a>
-            </div>
+    <div class="recipeCard">
+        <div class="recipeName">
+            @Html.DisplayFor(modelItem => recipe.Name)
         </div>
+          
+        <div>
+            @Html.DisplayFor(modelItem => recipe.RecipeType.Name)
+        </div>
+        <hr/>
+        <div class="recipeCardIngredients">
+            <ul>
+                @foreach (var ri in recipe.RecipeIngredients)
+                {
+                    <li>
+                        @ri.Ingredient.Name, @ri.Amount
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div>
+            <a asp-action="Edit" asp-route-id="@recipe.RecipeId">Edit</a> |
+            <a asp-action="Delete" asp-route-id="@recipe.RecipeId" title="Delete">
+                <span style="color: black;">
+                    <i class="far fa-trash-alt"></i>
+                </span>
+            </a>
+        </div>
+    </div>
     }
 </div>
