@@ -48,3 +48,8 @@
     .recipeCardIngredients ul {
         padding-left: 4px;
     }
+
+.removeHeader {
+    background-color: white;
+    opacity: .8;
+}
